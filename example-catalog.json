@@ -1,0 +1,23 @@
+[
+  {
+    "code": "BOT-EXAMPLE-001",
+    "nameTh": "(ตัวอย่าง) ชื่อการ์ดไทย",
+    "nameEn": "(Example) English Name",
+    "set": "BT01",
+    "type": "Avatar",
+    "rarity": "SR",
+    "attribution": "แหล่งที่มา/อ้างอิง (ตัวอย่าง)",
+    "description": "นี่คือบรรทัดตัวอย่าง ไม่ใช่การ์ดจริง แก้ให้เป็นข้อมูลจริงก่อนนำเข้า",
+    "verified": false
+  },
+  {
+    "code": "BOT-EXAMPLE-002",
+    "nameTh": "(ตัวอย่าง) เวทมนตร์ตัวอย่าง",
+    "nameEn": "(Example) Sample Magic",
+    "set": "BT01",
+    "type": "Magic",
+    "rarity": "C",
+    "variant": "พิมพ์ปกติ",
+    "verified": false
+  }
+]

@@ -1,0 +1,20 @@
+{
+  "name": "คลังการ์ด BOT - Battle of Talingchan",
+  "short_name": "BOT Cards",
+  "description": "แอปจัดการคลังการ์ด Battle of Talingchan สำหรับใช้ส่วนตัว ข้อมูลเก็บในเบราว์เซอร์",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "lang": "th",
+  "icons": [
+    {
+      "src": "./favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

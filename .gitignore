@@ -1,0 +1,34 @@
+# การพึ่งพา
+node_modules
+.pnp
+.pnp.js
+
+# ผลลัพธ์การ build
+dist
+dist-ssr
+*.local
+
+# ไฟล์ชั่วคราว
+.tmp
+.vite
+*.tsbuildinfo
+node_modules/.tmp
+
+# ล็อก
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ข้อมูลการทดสอบ coverage
+coverage
+
+# ระบบปฏิบัติการ
+.DS_Store
+Thumbs.db
+
+# สภาพแวดล้อม / ความลับ (เราไม่ใช้ความลับ แต่กันไว้เผื่อ)
+.env
+.env.*
+!.env.example

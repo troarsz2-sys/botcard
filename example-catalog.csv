@@ -1,0 +1,3 @@
+id,code,nameTh,nameEn,set,type,rarity,variant,imageUrl,sourceUrl,attribution,description,lastVerified,verified,createdAt,updatedAt
+,BOT-EXAMPLE-001,(ตัวอย่าง) ชื่อการ์ดไทย,(Example) English Name,BT01,Avatar,SR,,,,แหล่งที่มา/อ้างอิง (ตัวอย่าง),คำอธิบายตัวอย่าง ไม่ใช่การ์ดจริง,,false,,
+,BOT-EXAMPLE-002,(ตัวอย่าง) เวทมนตร์ตัวอย่าง,(Example) Sample Magic,BT01,Magic,C,พิมพ์ปกติ,,,,,,คำอธิบายตัวอย่าง,,false,,

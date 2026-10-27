@@ -1,0 +1,18 @@
+[
+  {
+    "code": "BOT-EXAMPLE-001",
+    "owned": 2,
+    "forTrade": 1,
+    "condition": "Near Mint",
+    "acquiredAt": "2025-01-01",
+    "purchasePrice": 50,
+    "notes": "โน้ตส่วนตัวตัวอย่าง"
+  },
+  {
+    "code": "BOT-EXAMPLE-002",
+    "owned": 1,
+    "forTrade": 0,
+    "condition": "Good",
+    "notes": "อยากหาพิมพ์พิเศษเพิ่ม"
+  }
+]
