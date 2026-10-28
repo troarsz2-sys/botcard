@@ -67,10 +67,19 @@ export function ManualPage() {
   async function onSave() {
     setError('')
     setSaved('')
-    const code = form.code.trim()
+    const rawCode = form.code.trim()
     const nameTh = form.nameTh.trim()
-    if (!code) return setError('ต้องกรอกรหัสการ์ด (code)')
+    const rarity = form.rarity?.trim() ?? ''
+
+    if (!rawCode) return setError('ต้องกรอกรหัสการ์ด (code)')
     if (!nameTh) return setError('ต้องกรอกชื่อไทย (nameTh)')
+
+    // ถ้ากรอก rarity และ code ยังไม่มี rarity ต่อท้าย ให้ auto-append
+    // เช่น BT10-043 + UR → BT10-043-UR (เหมือนที่ sync ดึงมา)
+    const code = rarity && !rawCode.toUpperCase().endsWith(`-${rarity.toUpperCase()}`)
+      ? `${rawCode}-${rarity}`
+      : rawCode
+
     // ตรวจซ้ำ code
     const dup = catalog.find((c) => normalizeCode(c.code) === normalizeCode(code) && c.id !== editId)
     if (dup) return setError(`รหัส "${code}" มีอยู่แล้ว (${dup.nameTh}) กรุณาใช้รหัสอื่นหรือแก้ไขการ์ดนั้น`)
@@ -139,6 +148,12 @@ export function ManualPage() {
           <div>
             <label className="label">รหัสการ์ด (code) *</label>
             <input className="input" value={form.code} onChange={(e) => set('code', e.target.value)} placeholder="เช่น BT01-001" />
+            {/* แสดงรหัสจริงที่จะบันทึก เมื่อมี rarity */}
+            {form.code && form.rarity && !form.code.trim().toUpperCase().endsWith(`-${form.rarity.trim().toUpperCase()}`) && (
+              <p className="mt-1 text-xs text-amber-400">
+                รหัสที่จะบันทึก: <b>{form.code.trim()}-{form.rarity.trim()}</b> (เพิ่ม rarity ให้อัตโนมัติ)
+              </p>
+            )}
           </div>
           <div>
             <label className="label">ชื่อไทย *</label>
