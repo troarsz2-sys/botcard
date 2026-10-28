@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { useApp } from '../state/AppContext'
 import { CardTile } from '../components/CardTile'
 import { EmptyState, Loading } from '../components/Feedback'
@@ -13,13 +14,26 @@ const PAGE_SIZE = 60
 
 export function CatalogPage() {
   const { ready, catalog, collectionMap, wishlistMap, settings } = useApp()
-  const [query, setQuery] = useState('')
-  const [setFilter, setSetFilter] = useState('')
-  const [rarityFilter, setRarityFilter] = useState('')
-  const [typeFilter, setTypeFilter] = useState('')
-  const [status, setStatus] = useState<StatusFilter>('all')
-  const [sortBy, setSortBy] = useState<SortBy>('name')
-  const [page, setPage] = useState(1)
+
+  // เก็บ filter ใน URL เพื่อให้คงอยู่เมื่อกด Back
+  const [params, setParams] = useSearchParams()
+  const query = params.get('q') ?? ''
+  const setFilter = params.get('set') ?? ''
+  const rarityFilter = params.get('rarity') ?? ''
+  const typeFilter = params.get('type') ?? ''
+  const status = (params.get('status') ?? 'all') as StatusFilter
+  const sortBy = (params.get('sort') ?? 'name') as SortBy
+  const page = Number(params.get('page') ?? '1')
+
+  function setParam(key: string, value: string) {
+    setParams((prev) => {
+      const next = new URLSearchParams(prev)
+      if (value === '' || value === 'all' || value === 'name') next.delete(key)
+      else next.set(key, value)
+      if (key !== 'page') next.delete('page')
+      return next
+    })
+  }
 
   const sets = useMemo(
     () => distinctStrings([...catalog.map((c) => c.set), ...settings.knownSets]),
@@ -56,7 +70,6 @@ export function CatalogPage() {
       if (sortBy === 'name') return a.nameTh.localeCompare(b.nameTh, 'th')
       if (sortBy === 'code') return a.code.localeCompare(b.code)
       if (sortBy === 'rarity') return rarityRank(a.rarity) - rarityRank(b.rarity)
-      // owned desc
       return (collectionMap.get(b.id)?.owned ?? 0) - (collectionMap.get(a.id)?.owned ?? 0)
     })
     return list
@@ -66,11 +79,17 @@ export function CatalogPage() {
   const currentPage = Math.min(page, pageCount)
   const pageItems = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
 
+  // แสดง active filters
+  const activeCount = [setFilter, rarityFilter, typeFilter, status !== 'all' ? status : ''].filter(Boolean).length
+
   if (!ready) return <Loading />
 
   return (
     <div className="space-y-4">
-      <h1 className="text-xl font-semibold">แคตตาล็อกการ์ด</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-xl font-semibold">แคตตาล็อกการ์ด</h1>
+        <span className="text-sm text-slate-400">{filtered.length} รายการ</span>
+      </div>
 
       <div className="card-surface p-3">
         <div className="flex flex-wrap gap-2">
@@ -82,40 +101,49 @@ export function CatalogPage() {
               className="input pl-9"
               placeholder="ค้นชื่อไทย / อังกฤษ / รหัสการ์ด"
               value={query}
-              onChange={(e) => { setQuery(e.target.value); setPage(1) }}
+              onChange={(e) => setParam('q', e.target.value)}
               aria-label="ค้นหา"
             />
           </div>
-          <select className="input w-auto" value={setFilter} onChange={(e) => { setSetFilter(e.target.value); setPage(1) }} aria-label="กรองตามเซ็ต">
+          <select className="input w-auto" value={setFilter} onChange={(e) => setParam('set', e.target.value)} aria-label="กรองตามเซ็ต">
             <option value="">เซ็ต: ทั้งหมด</option>
             {sets.map((s) => <option key={s} value={s}>{s}</option>)}
           </select>
-          <select className="input w-auto" value={rarityFilter} onChange={(e) => { setRarityFilter(e.target.value); setPage(1) }} aria-label="กรองตามความหายาก">
+          <select className="input w-auto" value={rarityFilter} onChange={(e) => setParam('rarity', e.target.value)} aria-label="กรองตามความหายาก">
             <option value="">หายาก: ทั้งหมด</option>
             {rarities.map((r) => <option key={r} value={r}>{r}</option>)}
           </select>
-          <select className="input w-auto" value={typeFilter} onChange={(e) => { setTypeFilter(e.target.value); setPage(1) }} aria-label="กรองตามประเภท">
+          <select className="input w-auto" value={typeFilter} onChange={(e) => setParam('type', e.target.value)} aria-label="กรองตามประเภท">
             <option value="">ประเภท: ทั้งหมด</option>
             {types.map((t) => <option key={t} value={t}>{t}</option>)}
           </select>
-          <select className="input w-auto" value={status} onChange={(e) => { setStatus(e.target.value as StatusFilter); setPage(1) }} aria-label="กรองตามสถานะ">
+          <select className="input w-auto" value={status} onChange={(e) => setParam('status', e.target.value)} aria-label="กรองตามสถานะ">
             <option value="all">สถานะ: ทั้งหมด</option>
             <option value="owned">มีแล้ว</option>
             <option value="missing">ยังไม่มี</option>
             <option value="duplicate">มีซ้ำ</option>
             <option value="wanted">อยากได้</option>
           </select>
-          <select className="input w-auto" value={sortBy} onChange={(e) => setSortBy(e.target.value as SortBy)} aria-label="เรียงตาม">
+          <select className="input w-auto" value={sortBy} onChange={(e) => setParam('sort', e.target.value)} aria-label="เรียงตาม">
             <option value="name">เรียง: ชื่อ</option>
             <option value="code">เรียง: รหัส</option>
             <option value="rarity">เรียง: ความหายาก</option>
             <option value="owned">เรียง: จำนวนที่มี</option>
           </select>
+          {activeCount > 0 && (
+            <button
+              className="btn-ghost text-xs text-amber-400"
+              onClick={() => setParams({})}
+              aria-label="ล้างตัวกรอง"
+            >
+              <Icon name="x" size={14} /> ล้างตัวกรอง ({activeCount})
+            </button>
+          )}
         </div>
       </div>
 
       {catalog.length === 0 ? (
-        <EmptyState title="ยังไม่มีการ์ด" message="นำเข้าไฟล์หรือกรอกการ์ดเองก่อน" icon="catalog" />
+        <EmptyState title="ยังไม่มีการ์ด" message="ไปหน้าซิงก์ข้อมูลการ์ดเพื่อดาวน์โหลดข้อมูล หรือนำเข้าไฟล์ CSV/JSON" icon="catalog" />
       ) : pageItems.length === 0 ? (
         <EmptyState title="ไม่พบการ์ดที่ตรงเงื่อนไข" message="ลองเปลี่ยนคำค้นหรือตัวกรอง" icon="search" />
       ) : (
@@ -123,7 +151,12 @@ export function CatalogPage() {
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
             {pageItems.map((c) => <CardTile key={c.id} card={c} />)}
           </div>
-          <Pagination page={currentPage} pageSize={PAGE_SIZE} total={filtered.length} onPageChange={setPage} />
+          <Pagination
+            page={currentPage}
+            pageSize={PAGE_SIZE}
+            total={filtered.length}
+            onPageChange={(p) => setParam('page', String(p))}
+          />
         </>
       )}
     </div>
