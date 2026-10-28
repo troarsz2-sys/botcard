@@ -71,7 +71,7 @@ function buildDescription(raw: RawCommunityCard): string | undefined {
 
 /**
  * แปลงอาร์เรย์ raw card objects (parse จาก TypeScript ของ repo) → IncomingCard[]
- * ฟังก์ชัน pure ไม่ fetch เอง ทดสอบได้โดยตรง
+ * ใช้ code+rarity เป็น unique key เพราะการ์ดใบเดียวกันมีหลาย rarity (UR, SCR, CBR, PR ฯลฯ)
  */
 export function transformCommunityCards(raw: RawCommunityCard[]): TransformResult {
   const cards: IncomingCard[] = []
@@ -81,6 +81,7 @@ export function transformCommunityCards(raw: RawCommunityCard[]): TransformResul
   for (const r of raw) {
     const print = r.print?.trim()
     const name = r.name?.trim()
+    const rare = r.rare?.trim()
     if (!print) {
       errors.push(`ข้ามการ์ดที่ไม่มี print code: ${name ?? '?'}`)
       skipped++
@@ -97,18 +98,22 @@ export function transformCommunityCards(raw: RawCommunityCard[]): TransformResul
       continue
     }
 
+    // สร้าง code ที่รวม rarity เพื่อให้การ์ดเดียวกันแต่ต่าง rarity เป็นคนละใบ
+    // เช่น BT01-001-UR, BT01-001-SCR, BT01-001-CBR
+    const codeWithRarity = rare ? `${print}-${rare}` : print
+
     const card: IncomingCard = {
-      code: print,
+      code: codeWithRarity,
       nameTh: name,
       set: inferSet(print) || undefined,
       type: r.type || undefined,
-      rarity: r.rare || undefined,
-      variant: r.rare || undefined, // rare เป็น variant ในแหล่งนี้ (เช่น SCR/CBR)
+      rarity: rare || undefined,
+      variant: rare || undefined,
       description: buildDescription(r),
       sourceUrl: SOURCE_URL,
       attribution: ATTRIBUTION,
       lastVerified: new Date().toISOString().slice(0, 10),
-      verified: false, // fan-made, ไม่ใช่แหล่งทางการ
+      verified: false,
     }
     cards.push(card)
   }

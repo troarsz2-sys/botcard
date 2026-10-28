@@ -132,12 +132,12 @@ describe('transformCommunityCards', () => {
     expect(skipped).toBe(2)
   })
 
-  it('code = print field', () => {
+  it('code = print-rarity', () => {
     const { cards } = transformCommunityCards(raw)
-    expect(cards[0].code).toBe('BT01-001')
+    expect(cards[0].code).toBe('BT01-001-UR')
   })
 
-  it('set ถูก infer จาก print code', () => {
+  it('set ถูก infer จาก print code (ไม่รวม rarity)', () => {
     const { cards } = transformCommunityCards(raw)
     expect(cards[0].set).toBe('BT01')
   })
@@ -155,7 +155,7 @@ describe('transformCommunityCards', () => {
 
   it('description มีข้อมูล stats สำหรับ Avatar', () => {
     const { cards } = transformCommunityCards(raw)
-    const avatar = cards.find(c => c.code === 'BT01-001')
+    const avatar = cards.find(c => c.code === 'BT01-001-UR')
     expect(avatar?.description).toContain('Cost 3')
     expect(avatar?.description).toContain('Gem 2')
     expect(avatar?.description).toContain('Power 3')
@@ -163,7 +163,7 @@ describe('transformCommunityCards', () => {
 
   it('description มี subtype สำหรับ Magic', () => {
     const { cards } = transformCommunityCards(raw)
-    const magic = cards.find(c => c.code === 'BT01-036')
+    const magic = cards.find(c => c.code === 'BT01-036-UR')
     expect(magic?.description).toContain('Magic Normal')
   })
 
@@ -181,8 +181,8 @@ describe('transformCommunityCards', () => {
 })
 
 describe('ตรวจสอบ field ข้อมูลที่หายไป', () => {
-  it('การ์ดที่มีเฉพาะ print+name ยังแปลงได้', () => {
-    const raw: RawCommunityCard[] = [{ name: 'การ์ดทดสอบ', print: 'TST-001', type: 'Avatar', rare: 'C', soi: 1 }]
+  it('การ์ดที่มีเฉพาะ print+name ยังแปลงได้ (ไม่มี rarity code = print เฉยๆ)', () => {
+    const raw: RawCommunityCard[] = [{ name: 'การ์ดทดสอบ', print: 'TST-001', type: 'Avatar', rare: '', soi: 1 }]
     const { cards } = transformCommunityCards(raw)
     expect(cards[0].code).toBe('TST-001')
     expect(cards[0].nameTh).toBe('การ์ดทดสอบ')
@@ -194,7 +194,7 @@ describe('ตรวจสอบ field ข้อมูลที่หายไป
     ]
     const { cards } = transformCommunityCards(raw)
     expect(cards).toHaveLength(2)
-    expect(cards.map(c => c.code)).toEqual(['SET-001', 'SET-002'])
+    expect(cards.map(c => c.code)).toEqual(['SET-001-R', 'SET-002-C'])
   })
 })
 
